@@ -1,0 +1,4 @@
+{
+  "BASE_URL": "http://api-vanhack-event-sp.azurewebsites.net",
+  "SNACKBAR_HIDE_TIMEOUT": 4000
+}

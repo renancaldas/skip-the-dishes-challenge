@@ -1,0 +1,13 @@
+.store-products {
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.store-products .mid {
+  width: 100px;
+}
+
+

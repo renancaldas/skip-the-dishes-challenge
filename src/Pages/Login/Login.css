@@ -1,0 +1,22 @@
+.login {
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.login .logo {
+  width: 200px;
+}
+
+.login .mid {
+  width: 100px;
+}
+
+.login .toggle-form {
+  margin-top: 10px;
+}
+
+
+
