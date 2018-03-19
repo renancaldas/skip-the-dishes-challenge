@@ -33,7 +33,7 @@ This is a challenge proposed by [Skip the Dishes](https://www.skipthedishes.com/
 
 To run it, follow these steps:
 ```
-Clone the project and "cd" to the folder with the project and run:
+Clone the project, "cd" to the folder and run:
 
 $ npm install
 $ npm start
