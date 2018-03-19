@@ -15,9 +15,7 @@
 
 2. Description
 
-3. Endpoints
-
-4. Considerations
+3. Considerations
 
 &nbsp;
 #### 1. Tech stack
