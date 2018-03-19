@@ -44,6 +44,6 @@ $ npm start
 &nbsp;
 #### 3. Considerations
 ---
-- This is an incomplete app. I have some problems with the wofo at the Hotel hosting the event.
+- This is an incomplete app. I have some problems with the wifi at the Hotel hosting the event.
 
 
