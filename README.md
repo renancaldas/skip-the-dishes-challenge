@@ -1,4 +1,8 @@
 
+#### This branch is incomplete. Please check the "complete-version" branch. 
+
+&nbsp;
+
 ![alt text](https://d1qb2nb5cznatu.cloudfront.net/startups/i/737643-2a6700c8f1ece4e4a335c28ad0414cc9-medium_jpg.jpg)
 #### VanHackathon 2018 
 
@@ -6,6 +10,8 @@
 - Project: React code challenge
 - Company: Skip the Dishes
 - Author: Renan Caldas de Oliveira (https://www.linkedin.com/in/renancaldas)
+
+
 
 &nbsp;
 #### Summary 
