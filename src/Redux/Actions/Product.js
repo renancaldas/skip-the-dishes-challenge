@@ -3,6 +3,7 @@ import config from '../../config/default.json';
 import axios from 'axios'; // "fetch" is an alternative as well
 
 export function getAllProductsByStoreId(storeId) {
+  console.log('>>> getAllProductsByStoreId', storeId)
   return {
     type: 'GET_PRODUCTS',
     payload: new Promise((resolve, reject) => {

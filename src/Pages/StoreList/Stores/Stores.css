@@ -1,0 +1,10 @@
+.list {
+  height: calc(100vh - 130px);
+  overflow: auto;
+}
+
+.filterIcon { 
+  margin: 0 15px;
+  position: relative;
+  top: 8px;
+}

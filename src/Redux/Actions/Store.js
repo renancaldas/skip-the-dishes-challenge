@@ -26,6 +26,7 @@ export function getStoresBySearchText(searchText) {
 }
 
 export function getStoreDetailsById(storeId) {
+  console.log('>>> getStoreDetailsById', storeId)
   return {
     type: 'GET_STORE_DETAILS',
     payload: axios.get(`${config.BASE_URL}/api/v1/Store/${storeId}`)

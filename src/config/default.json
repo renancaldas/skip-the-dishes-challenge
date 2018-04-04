@@ -1,4 +1,7 @@
 {
   "BASE_URL": "http://api-vanhack-event-sp.azurewebsites.net",
-  "SNACKBAR_HIDE_TIMEOUT": 4000
+  "SNACKBAR_HIDE_TIMEOUT": 4000,
+  "COLOURS": {
+    "RED": "#be2c2c"
+  }
 }

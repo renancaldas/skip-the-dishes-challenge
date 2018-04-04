@@ -4,6 +4,9 @@ const defaultState = {
   snackBar: {
     open: false,
     message: ''
+  },
+  drawer: {
+    open: false
   }
 };
 
@@ -26,6 +29,24 @@ export default function reducer(state = defaultState, action) {
         snackBar: {
           open: false,
           message: ''
+        }
+      };
+    }
+
+    case 'DRAWER_OPEN': {
+      return {
+        ...state,
+        drawer: {
+          open: true
+        }
+      };
+    }
+
+    case 'DRAWER_CLOSE': {
+      return {
+        ...state,
+        drawer: {
+          open: false
         }
       };
     }

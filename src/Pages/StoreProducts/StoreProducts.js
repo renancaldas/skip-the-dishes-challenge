@@ -1,170 +1,222 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
+import { Card, CardMedia, CardText, CardTitle, CardActions } from 'material-ui/Card';
 import { List, ListItem } from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import AddIcon from 'material-ui/svg-icons/content/add';
-import RemoveIcon from 'material-ui/svg-icons/content/remove';
-import './StoreProducts.css';
-
-
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
+import IconButton from 'material-ui/IconButton';
+import IconDelete from 'material-ui/svg-icons/action/delete';
+import IconNoItems from 'material-ui/svg-icons/av/not-interested';
+import TextField from 'material-ui/TextField';
+import CircularProgress from 'material-ui/CircularProgress';
 
 // Redux
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
 import { getAllProductsByStoreId } from '../../Redux/Actions/Product';
 import { getStoreDetailsById } from '../../Redux/Actions/Store';
-import { createOrder, ackNewOrder } from '../../Redux/Actions/Order';
+import { addToCard, removeFromCart } from '../../Redux/Actions/Cart';
+import { createOrder } from '../../Redux/Actions/Order';
+
+// Local Dependencies
+import './StoreProducts.css';
+import Drawer from '../../Components/Drawer/Drawer';
+import Header from '../../Components/Header/Header';
+import ImgRestaurant from '../../assets/img/restaurant.png';
+import { truncate2Decimals } from '../../helpers/calc';
 
 class StoreProducts extends Component {
   state = {
-    selectedProducts: []
-  }
+    showOrderConfirm: false,
+    address: '',
+    contact: ''
+  };
 
   constructor(props) {
     super(props);
-    
+
     // User not logged in
-    if (!this.props.Customer.token) 
+    if (!props.Customer.token)
       browserHistory.push('/login'); // Go to Login
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { params } = this.props;
-
-    // A new order has been created
-    if(!this.props.orderCreated && nextProps.orderCreated) {
-      browserHistory.push(`/order/${params.orderId}`);
-    }
-  }
-
-  componentWillMount() {
-    console.log('>>>> this.props', this.props);
+  shouldComponentUpdate() {
+    const { Store, Product } = this.props;
+    return Store.storeDetails !== null && Product.productList !== null;
   }
 
   componentDidMount() {
     const { getAllProductsByStoreId, getStoreDetailsById, params } = this.props;
+
     getAllProductsByStoreId(params.storeId);
     getStoreDetailsById(params.storeId);
   }
 
-  addProduct(product) {
-    const { selectedProducts } = this.state;
-    selectedProducts.push(product)
-    this.setState({ selectedProducts });
+  componentWillReceiveProps(nextProps) {
+    // A new order has been created
+    if (!this.props.Order.orderCreated.order && nextProps.Order.orderCreated.order) {
+      browserHistory.push(`/myorders/${nextProps.Order.orderCreated.order.id}`);
+    }
   }
 
-  removeProduct(index) {
-    const { selectedProducts } = this.state
-    selectedProducts.splice(index, 1);
-    this.setState({ selectedProducts });
+  placeOrder() {
+    const { Customer, Cart, createOrder, params } = this.props;
+    const { address, contact } = this.state;
+
+    const total = this.getTotal(Cart.list);
+    createOrder(address, contact, params.storeId, Cart.list, total, Customer.token);
   }
 
-  openProductDetails(product) {
-    console.log('product', product);
+  parsePrice(price) {
+    return truncate2Decimals(price);
   }
 
-  onClickCreateOrder() {
-    const { createOrder, Customer } = this.props;
-    const { products } = this.state;
-    
-    // const order = {
-    //   ...
-    // }
-
-    // createOrder(order, Customer.token);
-    
-    let message = `
-      Sorry, but unfortunately I haven't time to continue. :(
-      The wifi at the hotel was really complicated...  
-      But I appreciate your time and effort to be here in Brazil, giving us this unique opportunity.
-      It was a great experience for me! :D
-    `;
-
-    alert(message);
+  getTotal(cart) {
+    return cart.reduce((acc, product, index) => acc + product.price, 0);
   }
 
   render() {
-    const { Product } = this.props;
-    const { selectedProducts } = this.state;
+    const { Store, Product, Cart, Order, addToCard, removeFromCart } = this.props;
+
+    const storeName = Store.storeDetails.store ? Store.storeDetails.store.name : '';
+    const storeAddress = Store.storeDetails.store ? Store.storeDetails.store.address : '';
 
     return (
-      <div className="store-products" >
+      <div className="store-products">
+        <Drawer />
+        <Header title="Menu" back={true} />
 
-        <div className="flex-row left">
-          <List>
-            <Subheader>Products</Subheader>
-            {
-              Product.productList && Product.productList.list.length > 0 && Product.productList.list.map((product,index) => (
-                <ListItem
-                  key={index}
-                  rightIcon={
-                    <AddIcon
-                      onClick={() => this.addProduct(product)}
-                    />
-                  }
-                  primaryText={product.name}
-                  secondaryText={product.description}
-                  onClick={() => this.openProductDetails(product)}
+        <div className="menu">
+          <Card>
+            <CardMedia
+              style={{ height: '300px', overflow: 'hidden' }}
+              overlay={<CardTitle title={storeName} subtitle={storeAddress} />}
+            >
+              <img src={ImgRestaurant} alt="" />
+            </CardMedia>
+            <CardText >
+              <List>
+                {Product.productList.list.map(product =>
+                  <ListItem
+                    key={product.id}
+                    primaryText={product.name}
+                    secondaryText={product.description}
+                    rightIcon={<label className="price">$ {this.parsePrice(product.price)}</label>}
+                    onClick={() => addToCard(product)}
+                  />)
+                }
+              </List>
+            </CardText>
+          </Card>
+        </div>
+
+        <div className="cart">
+          <Card>
+            <CardTitle title="" subtitle="Your order" />
+            <CardText >
+              <div>
+                <TextField
+                  hintText="Contact"
+                  fullWidth={true}
+                  onChange={e => this.setState({ contact: e.target.value })}
                 />
-              ))
-            }
-          </List>
-        </div>
 
-        <div className="mid">
-        </div>
-
-        <div className="flex-row right">
-          <List>
-            <Subheader>Selected Products</Subheader>
-            {
-              selectedProducts && selectedProducts.map((product, index) => (
-                <ListItem
-                  key={index}
-                  primaryText={product.name}
-                  rightIcon={
-                    <div>
-                      <RemoveIcon
-                        onClick={() => this.removeProduct(index)}
-                      />
-                    </div>
-                  }
+                <TextField
+                  hintText="Delivery Address"
+                  fullWidth={true}
+                  onChange={e => this.setState({ address: e.target.value })}
                 />
-              ))
-            }
-          </List>
+              </div>
 
-          <label> Total: {selectedProducts.reduce((acc, product, index) => acc + product.price, 0)} </label>
+              <List>
+                {Cart.list.length === 0 && <ListItem leftIcon={<IconNoItems />} primaryText="No items" />}
+                {Cart.list.map((product, index) =>
+                  <ListItem
+                    key={index}
+                    leftIcon={<IconDelete onClick={() => removeFromCart(index)} />}
+                    primaryText={product.name}
+                    rightIcon={<label className="price">$ {this.parsePrice(product.price)}</label>}
+                  />)
+                }
 
-          <RaisedButton
-            primary={true}
-            disabled={selectedProducts.length === 0}
-            label="Place order"
-            onClick={() => this.onClickCreateOrder()}
-          />
+                {
+                  Cart.list.length > 0 &&
+                  <ListItem
+                    disabled={true}
+                    primaryText="Total"
+                    rightIcon={
+                      <label className="total">
+                        $ {this.parsePrice(this.getTotal(Cart.list))}
+                      </label>
+                    }
+                  />
+                }
+              </List>
+            </CardText>
+            <CardActions className="footer">
+              <div />
+
+              <RaisedButton
+                label="Place order"
+                secondary={true}
+                disabled={Cart.list.length === 0 || this.state.address === '' || this.state.contact === '' }
+                onClick={() => this.setState({ showOrderConfirm: true })}
+              />
+            </CardActions>
+          </Card>
         </div>
+
+        <Dialog
+          actions={
+              Order.orderCreated.loading ? [<CircularProgress />] : [
+              <FlatButton
+                label="Cancel"
+                onClick={() => this.setState({ showOrderConfirm: false })}
+              />,
+              <FlatButton
+                label="Confirm"
+                secondary={true}
+                onClick={() => this.placeOrder()}
+              />,
+            ]
+          }
+          modal={false}
+          open={this.state.showOrderConfirm}
+          onRequestClose={() => this.setState({ showOrderConfirm: false })}
+        >
+          Would you like to confirm the order?
+
+          <ul>
+            <li> Contact: {this.state.contact} </li>
+            <li> Address: {this.state.address} </li>
+            <li> Total: $ {this.parsePrice(this.getTotal(Cart.list))} </li>
+          </ul>
+          
+        </Dialog>
+
       </div>
     );
   }
 }
 
-
 // Redux
-function mapStateToProps(state) {
+const mapStateToProps = (state) => {
   return {
     Store: state.Store,
     Product: state.Product,
-    Customer: state.Customer
+    Customer: state.Customer,
+    Cart: state.Cart,
+    Order: state.Order
   };
 }
 
-function mapDispatchToProps(dispatch) {
+const mapDispatchToProps = (dispatch) => {
   return {
-    getStoreDetailsById: bindActionCreators(getAllProductsByStoreId, dispatch),
+    getStoreDetailsById: bindActionCreators(getStoreDetailsById, dispatch),
     getAllProductsByStoreId: bindActionCreators(getAllProductsByStoreId, dispatch),
+    addToCard: bindActionCreators(addToCard, dispatch),
+    removeFromCart: bindActionCreators(removeFromCart, dispatch),
     createOrder: bindActionCreators(createOrder, dispatch)
   };
 }

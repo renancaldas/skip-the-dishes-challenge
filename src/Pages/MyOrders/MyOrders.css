@@ -1,0 +1,9 @@
+.myorders .order {
+  margin: 20px 2%;
+}
+
+.myorders .price {
+  min-width: 60px;
+  max-width: 70px;
+  width: auto !important;
+}

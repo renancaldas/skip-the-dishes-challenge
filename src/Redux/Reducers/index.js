@@ -6,6 +6,7 @@ import Customer from './Customer';
 import Order from './Order';
 import Product from './Product';
 import Store from './Store';
+import Cart from './Cart';
 
 export default combineReducers({
   App,
@@ -13,5 +14,6 @@ export default combineReducers({
   Customer,
   Order,
   Product,
-  Store  
+  Store,
+  Cart
 });

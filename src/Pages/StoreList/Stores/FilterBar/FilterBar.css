@@ -1,0 +1,19 @@
+.list {
+  height: calc(100vh - 130px);
+  overflow: auto;
+}
+
+.filter-icon { 
+  margin: 0 15px;
+  position: relative;
+  top: 8px;
+}
+
+.filter-cousine {
+  margin-right: 10px;
+}
+
+.filter-cousine label {
+  position: relative;
+  bottom: 5px;
+}

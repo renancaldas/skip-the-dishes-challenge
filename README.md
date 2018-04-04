@@ -15,7 +15,9 @@
 
 2. Description
 
-3. Considerations
+3. Endpoints
+
+4. Considerations
 
 &nbsp;
 #### 1. Tech stack
@@ -33,7 +35,7 @@ This is a challenge proposed by [Skip the Dishes](https://www.skipthedishes.com/
 
 To run it, follow these steps:
 ```
-Clone the project, "cd" to the folder and run:
+Clone the project and "cd" to the folder with the project and run:
 
 $ npm install
 $ npm start
@@ -42,6 +44,6 @@ $ npm start
 &nbsp;
 #### 3. Considerations
 ---
-- This is an incomplete app. I had some problems with the wifi at the Hotel hosting the event.
+- This is an incomplete app. I have some problems with the wofo at the Hotel hosting the event.
 
 

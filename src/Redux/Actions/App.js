@@ -11,3 +11,15 @@ export function closeSnackbar(ackAction) {
     type: 'SNACKBAR_CLOSE'
   }
 }
+
+export function openDrawer(ackAction) {
+  return {
+    type: 'DRAWER_OPEN'
+  }
+}
+
+export function closeDrawer(ackAction) {
+  return {
+    type: 'DRAWER_CLOSE'
+  }
+}

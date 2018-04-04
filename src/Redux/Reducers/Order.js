@@ -23,7 +23,7 @@ export default function reducer(state = defaultState, action) {
 
     // GET_ORDER_DETAILS
     // ------------------------------------------------------------------
-    case 'GET_ORDER_DETAILS': {
+    case 'GET_ORDER_DETAILS_PENDING': {
       return {
         ...state,
         orderDetails: {
@@ -57,7 +57,7 @@ export default function reducer(state = defaultState, action) {
 
     // CREATE_ORDER
     // ------------------------------------------------------------------
-    case 'CREATE_ORDER': {
+    case 'CREATE_ORDER_PENDING': {
       return {
         ...state,
         orderCreated: {
@@ -73,7 +73,7 @@ export default function reducer(state = defaultState, action) {
         orderCreated: {
           ...state.orderCreated,
           loading: false,
-          order: action.payload && action.payload.data ? new Order(action.payload.data) : null
+          order: action.payload && action.payload.data ? action.payload.data : null // TODO: use class Order
         }
       };
     }
@@ -89,9 +89,19 @@ export default function reducer(state = defaultState, action) {
       };
     }
 
+    case 'CREATE_ORDER_ACK': {
+      return {
+        ...state,
+        orderCreated: {
+          ...state.orderCreated,
+          order: null
+        }
+      };
+    }
+
     // GET_CUSTOMER_ORDERS
     // ------------------------------------------------------------------
-    case 'GET_CUSTOMER_ORDERS': {
+    case 'GET_CUSTOMER_ORDERS_PENDING': {
       return {
         ...state,
         customerOrders: {
@@ -107,7 +117,7 @@ export default function reducer(state = defaultState, action) {
         customerOrders: {
           ...state.customerOrders,
           loading: false,
-          list: action.payload && action.payload.data ? action.payload.data.map(item => new Order(item)) : []
+          list: action.payload && action.payload.data ? action.payload.data : [] // TODO: use class Order
         }
       };
     }

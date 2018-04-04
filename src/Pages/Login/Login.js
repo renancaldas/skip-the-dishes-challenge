@@ -4,39 +4,44 @@ import { Card, CardActions, CardText } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
-import './Login.css';
 
 // Redux
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { signIn, signUp, signUpAckError } from '../../Redux/Actions/Customer';
+import { signIn, signUp, customerAckError } from '../../Redux/Actions/Customer';
 import { showSnackbar } from '../../Redux/Actions/App';
 
+// Local Dependencies
+import './Login.css';
 import Logo from '../../assets/img/skip_logo.png';
 import config from '../../config/default.json';
+import { isEmailValid, isStringNullOrEmpty } from '../../helpers/validations';
+import { REQUIRED_FIELD, INVALID_EMAIL } from '../../helpers/messages';
 
 class Login extends Component {
   state = {
-    isSignIn: true,
+    submitted: false,
     customer: {
-      email: '',
-      password: ''
+      name: null,
+      address: null,
+      email: null,
+      password: null
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { signUpAckError, showSnackbar } = this.props;
+    const { customerAckError, showSnackbar } = this.props;
 
     // An error has occured
     if (!this.props.Customer.error && nextProps.Customer.error) {
       showSnackbar(nextProps.Customer.error);
-      setTimeout(() => { signUpAckError() }, config.SNACKBAR_HIDE_TIMEOUT);
+      customerAckError();
     }
 
     // Sign up
     if (!this.props.Customer.token && nextProps.Customer.token) {
       browserHistory.push('/stores'); // Go to StoreList
-    } 
+    }
   }
 
   onChangeName(name) {
@@ -64,31 +69,48 @@ class Login extends Component {
   }
 
   onSubmitClick() {
-    const { isSignIn, customer } = this.state;
-    const { signIn, signUp } = this.props;
+    const { customer } = this.state;
+    const { signIn, signUp, isSignIn } = this.props;
 
-    if (isSignIn)
-      signIn(customer);
-    else
-      signUp(customer);
+    if (isSignIn) {
+      const isInvalid = isStringNullOrEmpty(customer.email) 
+        || !isEmailValid(customer.email) 
+        || isStringNullOrEmpty(customer.password);
+      
+      if(!isInvalid)
+        signIn(customer);
+    } else {
+      const isInvalid = isStringNullOrEmpty(customer.name) 
+        || isStringNullOrEmpty(customer.address) 
+        || isStringNullOrEmpty(customer.email) 
+        || !isEmailValid(customer.email)
+        || isStringNullOrEmpty(customer.password);
+      
+      if(!isInvalid)
+        signUp(customer);
+    }
+
+    this.setState({ submitted: true });
   }
 
   render() {
-    const { isSignIn } = this.state;
-    const { Customer } = this.props;
+    const { customer, submitted } = this.state;
+    const { Customer, isSignIn } = this.props;
 
     const signInForm = (
       <div className="flex-row">
         <TextField
           hintText="Email"
           onChange={(e) => { this.onChangeEmail(e.target.value) }}
-        // errorText={errors.user}
+          errorText={submitted && (isStringNullOrEmpty(customer.email) ? REQUIRED_FIELD 
+            : (!isEmailValid(customer.email) ? INVALID_EMAIL : null))}
         />
-
+        <br />
         <TextField
           hintText="Password"
+          type="password"
           onChange={(e) => { this.onChangePassword(e.target.value) }}
-        // errorText={errors.user}
+          errorText={submitted && isStringNullOrEmpty(customer.password) ? REQUIRED_FIELD : null}
         />
       </div>
     );
@@ -96,28 +118,29 @@ class Login extends Component {
     const signUpForm = (
       <div className="flex-row">
         <TextField
-          hintText="Name"
+          hintText="Name *"
           onChange={(e) => { this.onChangeName(e.target.value) }}
-        // errorText={errors.user}
+          errorText={submitted && isStringNullOrEmpty(customer.name) ? REQUIRED_FIELD : null}
         />
-
+        <br />
         <TextField
-          hintText="Address"
+          hintText="Address *"
           onChange={(e) => { this.onChangeAddress(e.target.value) }}
-        // errorText={errors.user}
+          errorText={submitted && isStringNullOrEmpty(customer.address) ? REQUIRED_FIELD : null}
         />
-
+        <br />
         <TextField
-          hintText="Email"
+          hintText="Email *"
           onChange={(e) => { this.onChangeEmail(e.target.value) }}
-        // errorText={errors.user}
+          errorText={submitted && (isStringNullOrEmpty(customer.email) ? REQUIRED_FIELD 
+            : (!isEmailValid(customer.email) ? INVALID_EMAIL : null))}
         />
-
+        <br />
         <TextField
-          hintText="Password"
+          hintText="Password *"
           type="password"
           onChange={(e) => { this.onChangePassword(e.target.value) }}
-        // errorText={errors.user}
+          errorText={submitted && isStringNullOrEmpty(customer.password) ? REQUIRED_FIELD : null}
         />
       </div>
     )
@@ -144,21 +167,21 @@ class Login extends Component {
                 Customer.loading ? (
                   <CircularProgress />
                 ) : (
-                  <FlatButton
-                    primary={true}
-                    className="buttonLogin"
-                    label={isSignIn ? 'Sign In' : 'Sign Up'}
-                    onClick={() => this.onSubmitClick()}
-                  />
-                )
+                    <FlatButton
+                      primary={true}
+                      className="buttonLogin"
+                      label={isSignIn ? 'Sign In' : 'Sign Up'}
+                      onClick={() => this.onSubmitClick()}
+                    />
+                  )
               }
-              
+
             </CardActions>
           </Card>
 
           <label
             className="toggle-form clickable"
-            onClick={() => this.setState({ isSignIn: !isSignIn })}
+            onClick={() => browserHistory.push(isSignIn ? '/signup' : '/login')}
           >
             {isSignIn ? 'I don\'t have an account' : 'I have an account'}
           </label>
@@ -178,7 +201,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     signIn: bindActionCreators(signIn, dispatch),
     signUp: bindActionCreators(signUp, dispatch),
-    signUpAckError: bindActionCreators(signUpAckError, dispatch),
+    customerAckError: bindActionCreators(customerAckError, dispatch),
     showSnackbar: bindActionCreators(showSnackbar, dispatch),
   };
 }

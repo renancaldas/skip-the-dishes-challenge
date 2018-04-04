@@ -13,7 +13,16 @@ export function signIn(customer) {
 
   return {
     type: 'SIGN_IN',
-    payload: axios.post(`${config.BASE_URL}/api/v1/Customer/auth`, body)
+    payload: new Promise((resolve, reject) => {
+      axios.post(`${config.BASE_URL}/api/v1/Customer/auth`, body)
+        .then(response => {
+          localStorage.setItem('userToken', response.data);
+          resolve({ token: response.data })
+        })
+        .catch(err => reject(err))
+    })
+    
+    
   }
 }
 
@@ -22,14 +31,36 @@ export function signUp(customer) {
     type: 'SIGN_UP',
     payload: new Promise((resolve, reject) => {
       axios.post(`${config.BASE_URL}/api/v1/Customer`, customer)
-        .then(response => resolve({ token: response.data, customer }))
+        .then(response => {
+          localStorage.setItem('userToken', response.data);
+          resolve({ token: response.data, customer });
+        })
         .catch(err => reject(err))
     })
   }
 }
-
-export function signUpAckError() {
+export function signOut() {
   return {
-    type: 'SIGN_UP_ERROR_ACK'
+    type: 'SIGN_OUT',
+    payload: new Promise((resolve, reject) => {
+      localStorage.removeItem('userToken');
+      resolve();
+    })
+  }
+}
+
+export function checkStoredLogin() {
+  return {
+    type: 'CHECK_LOGIN',
+    payload: new Promise((resolve, reject) => {
+      const token = localStorage.getItem('userToken');
+      resolve({ token });
+    })
+  }
+}
+
+export function customerAckError() {
+  return {
+    type: 'CUSTOMER_ERROR_ACK'
   }
 }
