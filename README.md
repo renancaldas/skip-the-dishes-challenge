@@ -15,10 +15,6 @@
 
 2. Description
 
-3. Endpoints
-
-4. Considerations
-
 &nbsp;
 #### 1. Tech stack
 ---
@@ -41,9 +37,5 @@ $ npm install
 $ npm start
 ```
 
-&nbsp;
-#### 3. Considerations
----
-- This is an incomplete app. I have some problems with the wofo at the Hotel hosting the event.
 
 
